@@ -395,7 +395,8 @@
 ### 3.4 Подключение голсового модуля к Arduino
    Перед тем как подключить логическую часть к питанию, мы должны соединить голосовой модуль с Arduino для передачи команд.
    
-   ![AI-Arduino](https://github.com/user-attachments/assets/ad81b926-b0ca-40cd-a8ec-6b093e6d05b8)
+   ![AI-Arduino](https://github.com/user-attachments/assets/32d397e0-d0d7-4eb1-a7b4-809e232b7213)
+
 
 ### 3.5 Подключение логической части к L298N
    Теперь можно подключить Arduino и голосовой модуль к драйверу.
