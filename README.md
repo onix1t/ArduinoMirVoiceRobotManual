@@ -148,7 +148,69 @@
   ```
   Остаётся прописать сами команды, а именно какие моторы и в какои направлении нам нужно активировать при той или иной команде.
   В данном скетче, мы пропишем самые основные команды: впепрёд, назад, влево, вправо и стоп.
-  Также добавим команду "старт", которая позволяет роботу ехать вперёд до тех пор, пока не будет сказана команда "стоп". 
+  Также добавим команду "старт", которая позволяет роботу ехать вперёд до тех пор, пока не будет сказана команда "стоп".
+
+  ```
+  // Движение вперед
+  void moveForward() {
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+    delay(300000);
+    stopMotors();
+  }
+  
+  // Движение без остановки
+  void moveStart() {
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+  }
+  
+  // Движение назад
+  void moveBack() {
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+    delay(300000);
+    stopMotors();
+  }
+  
+  // Поворот вправо
+  void moveRight() {
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+    delay(150000);
+    stopMotors();
+  }
+  
+  // Поворот влево
+  void moveLeft() {
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+    delay(150000);
+    stopMotors();
+  }
+  
+  // Остановка двигателей
+  void stopMotors() {
+    digitalWrite(in1, LOW);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, LOW);
+  }
+  ```
+>[!NOTE]
+> Помимо стандартных команд, которые прописаны в скетче, в голосовой модуль загружено распознавание таких слов, как: "домой", "быстро", "медленно" и "спать".
+>
+>Первые три команды требуют написания отдельного кода, как и для основных команд, а команда "спать" уже работает и позволяет выключить на время функцию распознования слов на голосовои модуле.
   
 ### 2.3 Итоговый код
   В результате мы получили скетч, который обрабатывает запросы с голосового модуля через I2C и подаёт сигналы действий на моторчики.
