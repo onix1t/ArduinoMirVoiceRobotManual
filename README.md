@@ -403,3 +403,6 @@
    На драйвере эти ходы обозначены как: IN1, IN2, IN3 и IN4.
 
    ![Arduino-L298N](https://github.com/user-attachments/assets/b3e9b5db-942b-4141-98c5-8d3e379b5a6b)
+
+## FAQ
+Проект был сделан по заказу компании ООО "МИР" в 2024 году.
