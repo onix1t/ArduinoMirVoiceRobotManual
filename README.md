@@ -114,60 +114,60 @@
    Чтобы Arduino смогла читать данные через I2C, нужно его подключить, а также прописать порты, через которые Arduino будет передавать сигналы моторчикам.
 
    ```
-  #define ESP_SLAVE_ADDR 0x36
-  #include <Wire.h>
-  
-  const int in1 = 7; // Пин движения вперёд для колёс с правой стороны
-  const int in2 = 6; // Пин движения назад для колёс с правой стороны (+ШИМ)
-  const int in3 = 5; // Пин движения вперёд для колёс с левой стороны (+ШИМ)
-  const int in4 = 4; // Пин движения назад для колёс с левой стороны
-  
-  void setup() {
-    Wire.begin(ESP_SLAVE_ADDR);   // Устанавливаем адрес slave устройства I2C
-    Wire.onReceive(receiveEvent); // Устанавливаем обработчик для события получения данных
-    Serial.begin(9600);           // Настраиваем Serial для вывода логов
-  
-    // Инициализируем пины для управления двигателями как выходы
-    pinMode(in1, OUTPUT);
-    pinMode(in2, OUTPUT);
-    pinMode(in3, OUTPUT);
-    pinMode(in4, OUTPUT);
-  }
-  
-  void loop() {
-    delay(100);  // Пустой цикл
-  }
+   #define ESP_SLAVE_ADDR 0x36
+   #include <Wire.h>
+   
+   const int in1 = 7; // Пин движения вперёд для колёс с правой стороны
+   const int in2 = 6; // Пин движения назад для колёс с правой стороны (+ШИМ)
+   const int in3 = 5; // Пин движения вперёд для колёс с левой стороны (+ШИМ)
+   const int in4 = 4; // Пин движения назад для колёс с левой стороны
+   
+   void setup() {
+     Wire.begin(ESP_SLAVE_ADDR);   // Устанавливаем адрес slave устройства I2C
+     Wire.onReceive(receiveEvent); // Устанавливаем обработчик для события получения данных
+     Serial.begin(9600);           // Настраиваем Serial для вывода логов
+   
+     // Инициализируем пины для управления двигателями как выходы
+     pinMode(in1, OUTPUT);
+     pinMode(in2, OUTPUT);
+     pinMode(in3, OUTPUT);
+     pinMode(in4, OUTPUT);
+   }
+   
+   void loop() {
+     delay(100);  // Пустой цикл
+   }
    ```
 
   Теперь мы должны прописать процесс считывания информации и распознавания команд.
 
    ```
-  void receiveEvent(int howMany) {
-    if (howMany <= 0) return;  // Проверка, есть ли данные для чтения
-  
-    String command = ""; // Объявление переменной для записи команды
-  
-    // Считываем все пришедшие символы в переменную command
-    while (Wire.available() > 0) { 
-      char c = Wire.read();
-      command += c;  
-    }
-    
-    // Анализируем команду и выполняем соответствующие действия
-    if (command.indexOf("вперед") != -1) {
-      moveForward();
-    } else if (command.indexOf("назад") != -1) {
-      moveBack();
-    } else if (command.indexOf("старт")!= -1) {
-      moveStart();
-    }else if (command.indexOf("стоп") != -1) {
-      stopMotors();
-    } else if (command.indexOf("вправо") != -1) {
-      moveRight();
-    } else if (command.indexOf("влево") != -1) {
-      moveLeft();
-    }
-  }
+   void receiveEvent(int howMany) {
+     if (howMany <= 0) return;  // Проверка, есть ли данные для чтения
+   
+     String command = ""; // Объявление переменной для записи команды
+   
+     // Считываем все пришедшие символы в переменную command
+     while (Wire.available() > 0) { 
+       char c = Wire.read();
+       command += c;  
+     }
+     
+     // Анализируем команду и выполняем соответствующие действия
+     if (command.indexOf("вперед") != -1) {
+       moveForward();
+     } else if (command.indexOf("назад") != -1) {
+       moveBack();
+     } else if (command.indexOf("старт")!= -1) {
+       moveStart();
+     }else if (command.indexOf("стоп") != -1) {
+       stopMotors();
+     } else if (command.indexOf("вправо") != -1) {
+       moveRight();
+     } else if (command.indexOf("влево") != -1) {
+       moveLeft();
+     }
+   }
    ```
 
   Остаётся прописать сами команды, а именно какие моторы и в каком направлении нам нужно активировать при той или иной команде.
@@ -175,61 +175,61 @@
   Также добавим команду "старт", которая позволяет роботу ехать вперёд до тех пор, пока не будет сказана команда "стоп".
   
    ```
-  // Движение вперед
-  void moveForward() {
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, HIGH);
-    digitalWrite(in3, HIGH);
-    digitalWrite(in4, LOW);
-    delay(300000);
-    stopMotors();
-  }
-  
-  // Движение без остановки
-  void moveStart() {
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, HIGH);
-    digitalWrite(in3, HIGH);
-    digitalWrite(in4, LOW);
-  }
-  
-  // Движение назад
-  void moveBack() {
-    digitalWrite(in1, HIGH);
-    digitalWrite(in2, LOW);
-    digitalWrite(in3, LOW);
-    digitalWrite(in4, HIGH);
-    delay(300000);
-    stopMotors();
-  }
-  
-  // Поворот вправо
-  void moveRight() {
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, HIGH);
-    digitalWrite(in3, LOW);
-    digitalWrite(in4, HIGH);
-    delay(150000);
-    stopMotors();
-  }
-  
-  // Поворот влево
-  void moveLeft() {
-    digitalWrite(in1, HIGH);
-    digitalWrite(in2, LOW);
-    digitalWrite(in3, HIGH);
-    digitalWrite(in4, LOW);
-    delay(150000);
-    stopMotors();
-  }
-  
-  // Остановка двигателей
-  void stopMotors() {
-    digitalWrite(in1, LOW);
-    digitalWrite(in2, LOW);
-    digitalWrite(in3, LOW);
-    digitalWrite(in4, LOW);
-  }
+   // Движение вперед
+   void moveForward() {
+     digitalWrite(in1, HIGH);
+     digitalWrite(in2, LOW);
+     digitalWrite(in3, HIGH);
+     digitalWrite(in4, LOW);
+     delay(300000);
+     stopMotors();
+   }
+   
+   // Движение без остановки
+   void moveStart() {
+     digitalWrite(in1, HIGH);
+     digitalWrite(in2, LOW);
+     digitalWrite(in3, HIGH);
+     digitalWrite(in4, LOW);
+   }
+   
+   // Движение назад
+   void moveBack() {
+     digitalWrite(in1, LOW);
+     digitalWrite(in2, HIGH);
+     digitalWrite(in3, LOW);
+     digitalWrite(in4, HIGH);
+     delay(300000);
+     stopMotors();
+   }
+   
+   // Поворот вправо
+   void moveRight() {
+     digitalWrite(in1, HIGH);
+     digitalWrite(in2, LOW);
+     digitalWrite(in3, LOW);
+     digitalWrite(in4, HIGH);
+     delay(150000);
+     stopMotors();
+   }
+   
+   // Поворот влево
+   void moveLeft() {
+     digitalWrite(in1, LOW);
+     digitalWrite(in2, HIGH);
+     digitalWrite(in3, HIGH);
+     digitalWrite(in4, LOW);
+     delay(150000);
+     stopMotors();
+   }
+   
+   // Остановка двигателей
+   void stopMotors() {
+     digitalWrite(in1, LOW);
+     digitalWrite(in2, LOW);
+     digitalWrite(in3, LOW);
+     digitalWrite(in4, LOW);
+   }
    ```
 
    >[!TIP]
@@ -294,8 +294,8 @@
    
    // Движение вперед
    void moveForward() {
-     digitalWrite(in1, LOW);
-     digitalWrite(in2, HIGH);
+     digitalWrite(in1, HIGH);
+     digitalWrite(in2, LOW);
      digitalWrite(in3, HIGH);
      digitalWrite(in4, LOW);
      delay(300000);
@@ -304,16 +304,16 @@
    
    // Движение без остановки
    void moveStart() {
-     digitalWrite(in1, LOW);
-     digitalWrite(in2, HIGH);
+     digitalWrite(in1, HIGH);
+     digitalWrite(in2, LOW);
      digitalWrite(in3, HIGH);
      digitalWrite(in4, LOW);
    }
    
    // Движение назад
    void moveBack() {
-     digitalWrite(in1, HIGH);
-     digitalWrite(in2, LOW);
+     digitalWrite(in1, LOW);
+     digitalWrite(in2, HIGH);
      digitalWrite(in3, LOW);
      digitalWrite(in4, HIGH);
      delay(300000);
@@ -322,8 +322,8 @@
    
    // Поворот вправо
    void moveRight() {
-     digitalWrite(in1, LOW);
-     digitalWrite(in2, HIGH);
+     digitalWrite(in1, HIGH);
+     digitalWrite(in2, LOW);
      digitalWrite(in3, LOW);
      digitalWrite(in4, HIGH);
      delay(150000);
@@ -332,8 +332,8 @@
    
    // Поворот влево
    void moveLeft() {
-     digitalWrite(in1, HIGH);
-     digitalWrite(in2, LOW);
+     digitalWrite(in1, LOW);
+     digitalWrite(in2, HIGH);
      digitalWrite(in3, HIGH);
      digitalWrite(in4, LOW);
      delay(150000);
