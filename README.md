@@ -404,9 +404,9 @@
    ![Arduino-L298N](https://github.com/user-attachments/assets/b3e9b5db-942b-4141-98c5-8d3e379b5a6b)
 
 ### 3.6 Итоговый вид
-   В результате, мы успешно собрали робота на arduino с возможностью голосового управления.
-   
-   ![robot](https://github.com/user-attachments/assets/ecb86de4-d9ef-4ee6-a9fe-08e547754f5c)
+   В результате, мы успешно собрали робота с возможностью голосового управления на arduino.
+
+   ![robot](https://github.com/user-attachments/assets/131145bb-d22b-4f07-9d8d-638a319daf06)
 
 ## FAQ
 Проект был сделан по заказу компании ООО "МИР" в 2024 году.
