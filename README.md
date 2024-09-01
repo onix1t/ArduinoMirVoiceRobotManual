@@ -83,7 +83,7 @@
 
    Стойки, прикрученные к платформе с моторчиками:
    
-   ![stands](https://github.com/user-attachments/assets/e6dc4235-9bd0-4c83-b7c5-d502501ba7ed)
+   ![stands](https://github.com/user-attachments/assets/15064e04-da6d-473e-96ca-eddd799e834c)
 
    Теперь остаётся взять верхнюю платформу, сопоставить её с отверстиями для стоек и закрепить винтами.
 
