@@ -205,20 +205,20 @@
    
    // Поворот вправо
    void moveRight() {
-     digitalWrite(in1, HIGH);
-     digitalWrite(in2, LOW);
-     digitalWrite(in3, LOW);
-     digitalWrite(in4, HIGH);
+     digitalWrite(in1, LOW);
+     digitalWrite(in2, HIGH);
+     digitalWrite(in3, HIGH);
+     digitalWrite(in4, LOW);
      delay(150000);
      stopMotors();
    }
    
    // Поворот влево
    void moveLeft() {
-     digitalWrite(in1, LOW);
-     digitalWrite(in2, HIGH);
-     digitalWrite(in3, HIGH);
-     digitalWrite(in4, LOW);
+     digitalWrite(in1, HIGH);
+     digitalWrite(in2, LOW);
+     digitalWrite(in3, LOW);
+     digitalWrite(in4, HIGH);
      delay(150000);
      stopMotors();
    }
