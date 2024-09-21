@@ -19,22 +19,23 @@
    - [Подключение моторчиков](#32-Подключение-моторчиков)
    - [Подключение источника питания к L298N](#33-Подключение-источника-питания-к-L298N)
    - [Подключение голсового модуля к Arduino](#34-Подключение-голсового-модуля-к-Arduino)
-   - [Подключение логической части к L298N](#35-Подключение-логической-части-к-L298N)
-   - [Итоговый вид](#36-Итоговый-вид)
+   - [Подключение модуля HM-10 к Arduino](#35-Подключение-модуля-HM-10-к-Arduino)
+   - [Подключение логической части к L298N](#36-Подключение-логической-части-к-L298N)
+   - [Итоговый вид](#37-Итоговый-вид)
 
 ## 1 Сборка корпуса робота
 ### 1.1 Подготовка инструментов и деталей
    Набор корпуса включает в себя следующий список деталей:
   
-   - 2 платформы корпуса
-   - 4 моторчика
-   - 4 колеса
-   - 4 диска-енкодера
-   - 8 крепежей для моторчиков
-   - 12 обычных винтов
-   - 8 длинных винтов
-   - 8 гаек
-   - 6 стоек
+   - 2 платформы корпуса;
+   - 4 моторчика;
+   - 4 колеса;
+   - 4 диска-енкодера;
+   - 8 крепежей для моторчиков;
+   - 12 обычных винтов;
+   - 8 длинных винтов;
+   - 8 гаек;
+   - 6 стоек.
 
    ![details](https://github.com/user-attachments/assets/50ad3057-91b9-44c3-9f6f-28900af01800)
 
@@ -43,11 +44,11 @@
 ### 1.2 Установка моторчиков
    Детали для даннного этапа:
   
-   - 1 платформа
-   - 4 моторчика
-   - 8 крпежей для моторчика
-   - 8 длинных винтов
-   - 8 гаек
+   - 1 платформа;
+   - 4 моторчика;
+   - 8 крпежей для моторчика;
+   - 8 длинных винтов;
+   - 8 гаек.
 
    В первую очередь нам нужно взять платформу и найти следующие отверстия и вырезы для крепежей моторчиков.
     
@@ -73,9 +74,9 @@
 ### 1.4 Установка верхней части
    Последним этапом сборки является установка верхней платформы. Для её установки нам понадобится:
 
-   - 6 стоек
-   - 12 обычных винтов
-   - 1 платформа корпуса
+   - 6 стоек;
+   - 12 обычных винтов;
+   - 1 платформа корпуса.
 
    Стойки нужно закрепить винтами при помощи крестовой отвёртки в следующие отверстия на платформе с моторчиками:
 
@@ -103,29 +104,31 @@
    Сначала нам стоит определиться, каким образом Arduino будет принимать информацию с голосового модуля.
    Есть три способа:
   
-   - UART
-   - I2C
-   - SPI
+   - UART;
+   - I2C;
+   - SPI.
 
    Для наших задач нам больше всего подойдёт UART или I2C, так как они просты в подключении и требуют меньше проводов, чем SPI.
-   В данной инструкции мы будем рассматривать подключение через I2C, так как передача данных по нему быстрее, чем на UART, а также данный тип подключения поддерживает связь с несколькими устройствами на одной шине.
-   Это позволяет легко подключить несколько датчиков, модулей или контроллеров на одной линии (SDA и SCL), что экономит количество проводов и упрощает схему.
+   В данной инструкции мы будем рассматривать подключение через UART, так как его поддерживают все модули, которые нам нужно будет подключить.
 
-   Чтобы Arduino смогла читать данные через I2C, нужно его подключить, а также прописать порты, через которые Arduino будет передавать сигналы моторчикам.
+   Чтобы Arduino смогла читать данные через UART, нужно его подключить, а также прописать порты, через которые Arduino будет передавать сигналы моторчикам.
 
    ```
-   #define ESP_SLAVE_ADDR 0x36
-   #include <Wire.h>
+   #include <SoftwareSerial.h>
    
-   const int in1 = 7; // Пин движения вперёд для колёс с правой стороны
-   const int in2 = 6; // Пин движения назад для колёс с правой стороны (+ШИМ)
-   const int in3 = 5; // Пин движения вперёд для колёс с левой стороны (+ШИМ)
-   const int in4 = 4; // Пин движения назад для колёс с левой стороны
+   const int in1 = 7;             // Пин движения вперёд для колёс с правой стороны
+   const int in2 = 6;             // Пин движения назад для колёс с правой стороны (+ШИМ)
+   const int in3 = 5;             // Пин движения вперёд для колёс с левой стороны (+ШИМ)
+   const int in4 = 4;             // Пин движения назад для колёс с левой стороны
+   const int ble_rx = 3;          // Bluetooth module RX pin
+   const int ble_tx = 2;          // Bluetooth module TD pin
+   const int motion_delay = 550;  // Engine running time
+   
+   SoftwareSerial mySerial(ble_tx, ble_rx);
    
    void setup() {
-     Wire.begin(ESP_SLAVE_ADDR);   // Устанавливаем адрес slave устройства I2C
-     Wire.onReceive(receiveEvent); // Устанавливаем обработчик для события получения данных
-     Serial.begin(9600);           // Настраиваем Serial для вывода логов
+     Serial.begin(9600);  // Настраиваем Serial для вывода логов
+     mySerial.begin(9600);
    
      // Инициализируем пины для управления двигателями как выходы
      pinMode(in1, OUTPUT);
@@ -133,47 +136,34 @@
      pinMode(in3, OUTPUT);
      pinMode(in4, OUTPUT);
    }
-   
-   void loop() {
-     delay(100);  // Пустой цикл
-   }
    ```
 
   Теперь мы должны прописать процесс считывания информации и распознавания команд.
 
    ```
-   void receiveEvent(int howMany) {
-     if (howMany <= 0) return;  // Проверка, есть ли данные для чтения
+   void loop() {
+     if (mySerial.available()) {
+       String command = "";
+       command = mySerial.readString();
+       Serial.println("DATA RECEIVED:");
+       Serial.println(command);
    
-     String command = ""; // Объявление переменной для записи команды
-   
-     // Считываем все пришедшие символы в переменную command
-     while (Wire.available() > 0) { 
-       char c = Wire.read();
-       command += c;  
-     }
-     
-     // Анализируем команду и выполняем соответствующие действия
-     if (command.indexOf("вперед") != -1) {
-       moveForward();
-     } else if (command.indexOf("назад") != -1) {
-       moveBack();
-     } else if (command.indexOf("старт")!= -1) {
-       moveStart();
-     }else if (command.indexOf("стоп") != -1) {
-       stopMotors();
-     } else if (command.indexOf("вправо") != -1) {
-       moveRight();
-     } else if (command.indexOf("влево") != -1) {
-       moveLeft();
+       if (command.indexOf("forward") != -1) {
+         moveForward();
+       } else if (command.indexOf("backward") != -1) {
+         moveBack();
+       } else if (command.indexOf("right") != -1) {
+         moveRight();
+       } else if (command.indexOf("left") != -1) {
+         moveLeft();
+       }
      }
    }
    ```
 
   Остаётся прописать сами команды, а именно какие моторы и в каком направлении нам нужно активировать при той или иной команде.
   В данном скетче мы пропишем самые основные команды: вперёд, назад, влево, вправо и стоп.
-  Также добавим команду "старт", которая позволяет роботу ехать вперёд до тех пор, пока не будет сказана команда "стоп".
-  
+
    ```
    // Движение вперед
    void moveForward() {
@@ -181,16 +171,8 @@
      digitalWrite(in2, LOW);
      digitalWrite(in3, HIGH);
      digitalWrite(in4, LOW);
-     delay(300000);
+     delay(motion_delay);
      stopMotors();
-   }
-   
-   // Движение без остановки
-   void moveStart() {
-     digitalWrite(in1, HIGH);
-     digitalWrite(in2, LOW);
-     digitalWrite(in3, HIGH);
-     digitalWrite(in4, LOW);
    }
    
    // Движение назад
@@ -199,27 +181,27 @@
      digitalWrite(in2, HIGH);
      digitalWrite(in3, LOW);
      digitalWrite(in4, HIGH);
-     delay(300000);
+     delay(motion_delay);
      stopMotors();
    }
    
    // Поворот вправо
    void moveRight() {
-     digitalWrite(in1, LOW);
-     digitalWrite(in2, HIGH);
-     digitalWrite(in3, HIGH);
-     digitalWrite(in4, LOW);
-     delay(150000);
+     digitalWrite(in1, HIGH);
+     digitalWrite(in2, LOW);
+     digitalWrite(in3, LOW);
+     digitalWrite(in4, HIGH);
+     delay(motion_delay);
      stopMotors();
    }
    
    // Поворот влево
    void moveLeft() {
-     digitalWrite(in1, HIGH);
-     digitalWrite(in2, LOW);
-     digitalWrite(in3, LOW);
-     digitalWrite(in4, HIGH);
-     delay(150000);
+     digitalWrite(in1, LOW);
+     digitalWrite(in2, HIGH);
+     digitalWrite(in3, HIGH);
+     digitalWrite(in4, LOW);
+     delay(motion_delay);
      stopMotors();
    }
    
@@ -233,26 +215,29 @@
    ```
 
    >[!TIP]
-   > Помимо стандартных команд, которые прописаны в скетче, в голосовой модуль загружено распознавание таких слов, как: "домой", "быстро", "медленно" и "спать".
+   > Помимо стандартных команд, которые прописаны в скетче, в голосовой модуль загружено распознавание таких слов, как: "старт", "домой", "быстро", "медленно" и "спать".
    >
-   >Первые три команды требуют написания отдельного кода, как и для основных команд, а команда "спать" уже работает и позволяет выключить на время функцию распознования слов на голосовои модуле.
+   >Первые четыре команды требуют написания отдельного кода, как и для основных команд, а команда "спать" уже работает и позволяет выключить на время функцию распознования слов на голосовои модуле.
   
 ### 2.3 Итоговый код
    В результате мы получили скетч, который обрабатывает запросы с голосового модуля через I2C и подаёт сигналы действий на моторчики.
 
    ```
-   #define ESP_SLAVE_ADDR 0x36
-   #include <Wire.h>
+   #include <SoftwareSerial.h>
    
-   const int in1 = 7; // Пин движения вперёд для колёс с правой стороны
-   const int in2 = 6; // Пин движения назад для колёс с правой стороны (+ШИМ)
-   const int in3 = 5; // Пин движения вперёд для колёс с левой стороны (+ШИМ)
-   const int in4 = 4; // Пин движения назад для колёс с левой стороны
+   const int in1 = 7;             // Пин движения вперёд для колёс с правой стороны
+   const int in2 = 6;             // Пин движения назад для колёс с правой стороны (+ШИМ)
+   const int in3 = 5;             // Пин движения вперёд для колёс с левой стороны (+ШИМ)
+   const int in4 = 4;             // Пин движения назад для колёс с левой стороны
+   const int ble_rx = 3;          // Bluetooth module RX pin
+   const int ble_tx = 2;          // Bluetooth module TD pin
+   const int motion_delay = 550;  // Engine running time
+   
+   SoftwareSerial mySerial(ble_tx, ble_rx);
    
    void setup() {
-     Wire.begin(ESP_SLAVE_ADDR);   // Устанавливаем адрес slave устройства I2C
-     Wire.onReceive(receiveEvent); // Устанавливаем обработчик для события получения данных
-     Serial.begin(9600);           // Настраиваем Serial для вывода логов
+     Serial.begin(9600);  // Настраиваем Serial для вывода логов
+     mySerial.begin(9600);
    
      // Инициализируем пины для управления двигателями как выходы
      pinMode(in1, OUTPUT);
@@ -262,33 +247,21 @@
    }
    
    void loop() {
-     delay(100);  // Пустой цикл
-   }
+     if (mySerial.available()) {
+       String command = "";
+       command = mySerial.readString();
+       Serial.println("DATA RECEIVED:");
+       Serial.println(command);
    
-   void receiveEvent(int howMany) {
-     if (howMany <= 0) return;  // Проверка, есть ли данные для чтения
-   
-     String command = ""; // Объявление переменной для записи команды
-   
-     // Считываем все пришедшие символы в переменную command
-     while (Wire.available() > 0) { 
-       char c = Wire.read();
-       command += c;  
-     }
-     
-     // Анализируем команду и выполняем соответствующие действия
-     if (command.indexOf("вперед") != -1) {
-       moveForward();
-     } else if (command.indexOf("назад") != -1) {
-       moveBack();
-     } else if (command.indexOf("старт")!= -1) {
-       moveStart();
-     }else if (command.indexOf("стоп") != -1) {
-       stopMotors();
-     } else if (command.indexOf("вправо") != -1) {
-       moveRight();
-     } else if (command.indexOf("влево") != -1) {
-       moveLeft();
+       if (command.indexOf("forward") != -1) {
+         moveForward();
+       } else if (command.indexOf("backward") != -1) {
+         moveBack();
+       } else if (command.indexOf("right") != -1) {
+         moveRight();
+       } else if (command.indexOf("left") != -1) {
+         moveLeft();
+       }
      }
    }
    
@@ -298,16 +271,8 @@
      digitalWrite(in2, LOW);
      digitalWrite(in3, HIGH);
      digitalWrite(in4, LOW);
-     delay(300000);
+     delay(motion_delay);
      stopMotors();
-   }
-   
-   // Движение без остановки
-   void moveStart() {
-     digitalWrite(in1, HIGH);
-     digitalWrite(in2, LOW);
-     digitalWrite(in3, HIGH);
-     digitalWrite(in4, LOW);
    }
    
    // Движение назад
@@ -316,7 +281,7 @@
      digitalWrite(in2, HIGH);
      digitalWrite(in3, LOW);
      digitalWrite(in4, HIGH);
-     delay(300000);
+     delay(motion_delay);
      stopMotors();
    }
    
@@ -326,7 +291,7 @@
      digitalWrite(in2, LOW);
      digitalWrite(in3, LOW);
      digitalWrite(in4, HIGH);
-     delay(150000);
+     delay(motion_delay);
      stopMotors();
    }
    
@@ -336,7 +301,7 @@
      digitalWrite(in2, HIGH);
      digitalWrite(in3, HIGH);
      digitalWrite(in4, LOW);
-     delay(150000);
+     delay(motion_delay);
      stopMotors();
    }
    
@@ -365,18 +330,19 @@
 ### 3.1 Подготовка инструментов и деталей
    Логическая часть робота состоит из:
 
-   - Плата Arduino UNO
-   - Плата управления моторами L298N
-   - AI-модуль голсового управления
-   - Источник питания (9В батарейка или аккумулятор)
-   - Провода
+   - Плата Arduino UNO;
+   - Плата управления моторами L298N;
+   - AI-модуль голсового управления;
+   - Источник питания (9В батарейка или аккумулятор);
+   - Модуль bluetooth управления HM-10;
+   - Провода.
 
 Из инструментов нам будет достаточно крестовой отвёртки соответствующего размера.
 
 ### 3.2 Подключение моторчиков
    В первую очередь подключаем моторчики к плате L298N следующим образом:
-   - Подключаем моторчики с правой стороны к выходам L298N OUT1 и OUT2
-   - Подключаем моторчики с левой стороны к выходам L298N OUT3 и OUT4
+   - Подключаем моторчики с правой стороны к выходам L298N OUT1 и OUT2;
+   - Подключаем моторчики с левой стороны к выходам L298N OUT3 и OUT4.
 
    ![Motors](https://github.com/user-attachments/assets/6e702409-39c7-4e78-8de5-9bc0e80573f2)
 
@@ -395,15 +361,19 @@
    
    ![AI-Arduino](https://github.com/user-attachments/assets/32d397e0-d0d7-4eb1-a7b4-809e232b7213)
 
+### 3.5 Подключение модуля HM-10 к Arduino
+   Остаётся подключить модуль, который позволит нам управлять роботом дистанционно при помощи bluetooth.
 
-### 3.5 Подключение логической части к L298N
+   /*Схемма подключения HM-10*/
+
+### 3.6 Подключение логической части к L298N
    Теперь можно подключить Arduino и голосовой модуль к драйверу.
    Помимо питания нам нужно будет подключить входы, которые позволят передавать команды на моторчики.
    На драйвере эти ходы обозначены как: IN1, IN2, IN3 и IN4.
 
    ![Arduino-L298N](https://github.com/user-attachments/assets/b3e9b5db-942b-4141-98c5-8d3e379b5a6b)
 
-### 3.6 Итоговый вид
+### 3.7 Итоговый вид
    В результате, мы успешно собрали робота с возможностью голосового управления на arduino.
 
    ![robot](https://github.com/user-attachments/assets/131145bb-d22b-4f07-9d8d-638a319daf06)
