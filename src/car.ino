@@ -11,6 +11,7 @@ const int motion_delay = 550;  // Engine running time
 SoftwareSerial mySerial(ble_tx, ble_rx);
 
 void setup() {
+  // Настройка UART
   Serial.begin(9600);  // Настраиваем Serial для вывода логов
   mySerial.begin(9600);
 
